@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>CSE 4204 &middot; Houses from Outside &middot; Group 07 (C2)</title>
+		<link rel="stylesheet" href="css/style.css" />
+	</head>
+	<body>
+		<!-- WebGL canvas is appended here by js/main.js -->
+		<div id="app"></div>
+
+		<!-- ------------------------------------------------ loading screen -->
+		<div id="loading">
+			<div class="load-card">
+				<div class="load-kicker">Computer Graphics Lab &middot; CSE 4204</div>
+				<h1 class="load-title">Houses from Outside</h1>
+				<div class="load-sub">Project Serial 08 &middot; Group 07 &middot; Section C2</div>
+				<div class="load-track"><div id="load-bar" class="load-bar"></div></div>
+				<div id="load-text" class="load-text">Loading Three.js&hellip;</div>
+				<div id="load-error" class="load-error hidden"></div>
+			</div>
+		</div>
+
+		<!-- ------------------------------------------------------------ HUD -->
+		<div id="hud">
+			<!-- top left: identity card -->
+			<section class="card card-info">
+				<div class="badge-row">
+					<span class="badge badge-accent">Serial 08</span>
+					<span class="badge">Group 07</span>
+					<span class="badge">Section C2</span>
+				</div>
+				<h1>Houses from Outside</h1>
+				<p class="muted">Computer Graphics Lab &middot; CSE 4204</p>
+				<ul class="members">
+					<li><span>20220104141</span> Jakaria Mahmud</li>
+					<li><span>20220104147</span> Md. Redwan Hossen</li>
+				</ul>
+			</section>
+
+			<!-- top right: live stats -->
+			<section class="card card-stats">
+				<div class="card-head">
+					<span>Live scene state</span>
+					<span id="stat-fps" class="pill">-- fps</span>
+				</div>
+				<dl>
+					<div><dt>Time of day</dt><dd id="stat-time">--</dd></div>
+					<div><dt>Orbiting light</dt><dd id="stat-light">running</dd></div>
+					<div><dt>Cottage texture</dt><dd id="stat-cottage">--</dd></div>
+					<div><dt>Building facade</dt><dd id="stat-building">--</dd></div>
+					<div><dt>Camera FOV</dt><dd id="stat-fov">--</dd></div>
+					<div><dt>Camera pos</dt><dd id="stat-cam">--</dd></div>
+					<div><dt>Triangles</dt><dd id="stat-tris">--</dd></div>
+					<div><dt>Shadow maps</dt><dd id="stat-shadow">on</dd></div>
+				</dl>
+				<div class="card-foot">
+					Three.js from <span id="stat-source">&mdash;</span>
+				</div>
+			</section>
+
+			<!-- bottom left: cheat sheet -->
+			<section class="card card-keys">
+				<div class="card-head"><span>Quick controls</span><span class="pill">G = full list</span></div>
+				<div class="key-grid">
+					<div><kbd>W</kbd><kbd>S</kbd><span>closer / away</span></div>
+					<div><kbd>A</kbd><kbd>D</kbd><span>orbit houses</span></div>
+					<div><kbd>Q</kbd><kbd>E</kbd><span>look down / up</span></div>
+					<div><kbd>1</kbd>&hellip;<kbd>5</kbd><span>camera presets</span></div>
+					<div><kbd>Space</kbd><span>auto orbit tour</span></div>
+					<div><kbd>Click</kbd><span>cottage texture</span></div>
+				</div>
+			</section>
+
+			<!-- bottom right: action buttons -->
+			<section class="card card-actions">
+				<button id="btn-cottage" type="button" class="btn btn-primary">Change cottage texture</button>
+				<button id="btn-facade" type="button" class="btn">Building facade</button>
+				<button id="btn-daynight" type="button" class="btn">Pause day / night</button>
+				<button id="btn-light" type="button" class="btn">Pause orbit light</button>
+				<button id="btn-snap" type="button" class="btn">Save snapshot (P)</button>
+				<button id="btn-help" type="button" class="btn btn-ghost">Help (G)</button>
+			</section>
+		</div>
+
+		<!-- hover tooltip over the cottage -->
+		<div id="tooltip" class="hidden">Click the cottage to change its texture</div>
+
+		<!-- transient message -->
+		<div id="toast" class="hidden"></div>
+
+		<!-- ------------------------------------------------- help overlay -->
+		<div id="help-overlay" class="hidden">
+			<div class="help-panel">
+				<header>
+					<div>
+						<h2>Controls &amp; requirement map</h2>
+						<p class="muted">Project 08 &mdash; Houses from outside &middot; Group 07 &middot; Section C2</p>
+					</div>
+					<button id="help-close" type="button" class="btn btn-ghost">Close (G / Esc)</button>
+				</header>
+
+				<div class="help-grid">
+					<div class="help-col">
+						<h3>Camera &mdash; keyboard</h3>
+						<ul>
+							<li><kbd>W</kbd> <kbd>S</kbd> move closer / further from the houses</li>
+							<li><kbd>A</kbd> <kbd>D</kbd> orbit left / right around the houses</li>
+							<li><kbd>Q</kbd> <kbd>E</kbd> lower / raise the orbit elevation</li>
+							<li><kbd>R</kbd> <kbd>F</kbd> raise / lower the look-at point</li>
+							<li><kbd>&larr;</kbd> <kbd>&rarr;</kbd> <kbd>&uarr;</kbd> <kbd>&darr;</kbd> pan across the plot</li>
+							<li><kbd>Shift</kbd> hold to move 2.4&times; faster</li>
+							<li><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd><kbd>5</kbd> camera presets</li>
+							<li><kbd>[</kbd> <kbd>]</kbd> narrow / widen perspective FOV</li>
+							<li><kbd>V</kbd> reset the view, <kbd>Space</kbd> auto orbit tour</li>
+						</ul>
+					</div>
+
+					<div class="help-col">
+						<h3>Scene &mdash; keyboard</h3>
+						<ul>
+							<li><kbd>C</kbd> next cottage texture (same as clicking it)</li>
+							<li><kbd>B</kbd> switch building facade brick &harr; concrete</li>
+							<li><kbd>T</kbd> pause / resume the day-night cycle</li>
+							<li><kbd>Y</kbd> skip time forward (about 3 hours)</li>
+							<li><kbd>L</kbd> pause / resume the orbiting light</li>
+							<li><kbd>O</kbd> show / hide the orbit path ring</li>
+							<li><kbd>K</kbd> summer &harr; autumn leaves</li>
+							<li><kbd>M</kbd> cycle wind strength</li>
+							<li><kbd>X</kbd> shadow maps on / off</li>
+							<li><kbd>P</kbd> save a PNG snapshot &middot; <kbd>H</kbd> hide the HUD</li>
+						</ul>
+					</div>
+
+					<div class="help-col">
+						<h3>Mouse</h3>
+						<ul>
+							<li><b>Left click on the cottage</b> &mdash; changes its texture (required interaction)</li>
+							<li><b>Hover the cottage</b> &mdash; blue rim highlight + tooltip</li>
+							<li><b>Left drag</b> &mdash; orbit the camera</li>
+							<li><b>Right drag</b> &mdash; pan the look-at point</li>
+							<li><b>Wheel</b> &mdash; zoom in / out</li>
+						</ul>
+						<h3>Snapshots for the report</h3>
+						<ul>
+							<li>Press <kbd>1</kbd>&hellip;<kbd>5</kbd>, then <kbd>P</kbd>. The PNG lands in your Downloads folder, ready for section 3.2.</li>
+						</ul>
+					</div>
+
+					<div class="help-col help-req">
+						<h3>Where each requirement is met</h3>
+						<ol>
+							<li><b>Custom shaders</b> &mdash; sky dome, building facade, cottage walls, foliage wind, chimney smoke, fresnel glow (<code>js/shaders.js</code>)</li>
+							<li><b>Lighting</b> &mdash; hemisphere + sun (shadow casting) + orbiting point light + street lamp, with hand-written Blinn-Phong in GLSL (<code>js/lighting.js</code>)</li>
+							<li><b>Perspective projection</b> &mdash; <code>PerspectiveCamera(55&deg;, 0.1, 1200)</code>, live FOV control with <kbd>[</kbd> <kbd>]</kbd></li>
+							<li><b>Texture on every object</b> &mdash; 14 procedural tileable sets with normal maps (<code>assets/textures</code>)</li>
+							<li><b>Animation</b> &mdash; light rotates around the building, plus day-night cycle, wind and smoke</li>
+							<li><b>Mouse + keyboard</b> &mdash; click the cottage to change texture, keyboard flies the camera around the houses</li>
+						</ol>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<noscript>
+			<div class="nojs">This project needs JavaScript and WebGL. Please open it in Chrome, Edge or Firefox.</div>
+		</noscript>
+
+		<script type="module" src="js/main.js"></script>
+	</body>
+</html>

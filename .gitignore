@@ -1,0 +1,30 @@
+# ---------------------------------------------------------------------
+# CSE 4204 - Project 08 - Houses from Outside
+#
+# IMPORTANT: vendor/three.module.js is NOT ignored on purpose.
+# It must be committed so the deployed site works even if the CDN
+# is blocked. It is about 1.2 MB, which is fine for GitHub.
+# ---------------------------------------------------------------------
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# logs and temporary files
+*.log
+qa_hud_preview.html
+
+# node (this project has no build step, but just in case)
+node_modules/
+package-lock.json
+
+# python cache from tools/gen_textures.py
+__pycache__/
+*.pyc
+
+# Vercel local files
+.vercel

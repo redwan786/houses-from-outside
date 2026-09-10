@@ -1,0 +1,8 @@
+This folder holds the Three.js library.
+
+Run 1-DOWNLOAD-LIBS.bat once (internet required) and three.module.js will
+be downloaded here automatically.
+
+Manual alternative:
+  https://unpkg.com/three@0.169.0/build/three.module.js
+Save that file in this folder with the exact name three.module.js
