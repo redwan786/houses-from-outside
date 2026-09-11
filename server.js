@@ -1,10 +1,11 @@
 /**
  * server.js
  * ---------------------------------------------------------------------------
- * Tiny static file server, used only as a fallback by 2-START-PROJECT.bat
- * when Python is not installed on the machine.
+ * Tiny static file server for running the project locally.
+ * Use it when Python is not installed on the machine.
  *
- *   node server.js 8204
+ *   node server.js          (port 8204 by default)
+ *   node server.js 8500     (any other port)
  *
  * ES modules cannot be loaded from file:// because of browser CORS rules,
  * so the project must be served over http://localhost.

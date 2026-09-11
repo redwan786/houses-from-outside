@@ -25,36 +25,55 @@ complete keyboard and mouse interaction.
 
 ---
 
-## Quick start (Windows)
+## Quick start (Windows 11)
 
-> The project needs a local HTTP server, because browsers refuse to load ES
-> modules from `file://`. Both steps below are automated — just double-click.
+> A browser refuses to load ES modules and textures over `file://`, so the
+> project must be opened through a **local HTTP server**. Double-clicking
+> `index.html` only shows a black screen. Pick any one of the three methods
+> below - they all do the same thing.
+>
+> Three.js is already inside `vendor/three.module.js`, so **no internet is
+> needed** at any point.
 
-**Step 1 — once, with internet:**
+### Method 1 - VS Code Live Server (easiest for a live demonstration)
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/), then inside it
+   install the extension **Live Server** (publisher: Ritwick Dey).
+2. `File > Open Folder...` and select this project folder.
+3. Right-click `index.html` in the Explorer panel and choose
+   **Open with Live Server**.
+4. The default browser opens at `http://127.0.0.1:5500/index.html`.
+5. To stop it, click **Port: 5500** in the blue status bar at the bottom.
+
+### Method 2 - Python
+
+1. Open this folder in File Explorer.
+2. Click the address bar, type `cmd`, press `Enter`.
+3. Run:
 
 ```
-1-DOWNLOAD-LIBS.bat
+python -m http.server 8204
 ```
 
-Downloads `three.module.js` (about 1.2 MB) into the `vendor\` folder. Run it
-only once. If it says `three.module.js already present`, you are done with this
-step forever.
+   If Windows says `python` is not recognised, use `py -3 -m http.server 8204`.
+4. Open <http://localhost:8204/index.html> in Chrome, Edge or Firefox.
+5. Press `Ctrl + C` in the terminal to stop the server.
 
-**Step 2 — every time you want to run the project:**
+### Method 3 - Node.js (uses `server.js` from this folder)
+
+1. Open this folder in File Explorer, type `cmd` in the address bar, `Enter`.
+2. Run:
 
 ```
-2-START-PROJECT.bat
+node server.js
 ```
 
-Starts a local server on port **8204** in a separate window and opens
-<http://localhost:8204/index.html> in your default browser. After Step 1 this
-works completely **offline**.
+3. Open <http://localhost:8204/index.html>.
+4. Press `Ctrl + C` to stop the server.
 
-To stop the project, close the black server window (or press `Ctrl+C` in it).
-
-**Requirements:** Windows 10/11 and any modern browser (Chrome, Edge, Firefox),
-plus **either** Python 3 **or** Node.js for the local server. The launcher tries
-`python`, then `py -3`, then `node server.js` and uses whichever it finds.
+**Requirements:** Windows 10/11 and any modern browser with WebGL 2 (Chrome,
+Edge or Firefox). Method 2 needs Python 3, Method 3 needs Node.js, Method 1
+needs neither.
 
 ---
 
@@ -151,31 +170,33 @@ frame when a snapshot is taken.
 ## Project structure
 
 ```
-CSE4204_Group7_C2_Houses_From_Outside/
-├── 1-DOWNLOAD-LIBS.bat          run once, with internet
-├── 2-START-PROJECT.bat          run every time
-├── index.html                   page shell and HUD markup
-├── server.js                    fallback local server (Node.js)
-├── css/
-│   └── style.css                HUD, help overlay, loading screen
-├── js/
-│   ├── three-loader.js          vendor → unpkg → jsDelivr fallback chain
-│   ├── config.js                every tunable constant
-│   ├── shaders.js               all hand-written GLSL
-│   ├── materials.js             ShaderMaterial factories
-│   ├── textures.js              texture loading, sRGB, anisotropy, tiling
-│   ├── lighting.js              lights, shadows, day-night, orbiting light
-│   ├── building.js              the building model
-│   ├── cottage.js               the cottage model + texture switching
-│   ├── environment.js           ground, sky, road, trees, props
-│   ├── controls.js              custom keyboard + mouse camera rig
-│   ├── hud.js                   HUD rendering and updates
-│   └── main.js                  renderer, raycasting, render loop, snapshots
-├── assets/textures/             31 generated PNG files
-├── tools/
-│   └── gen_textures.py          regenerates every texture
-├── vendor/                      three.module.js lands here
-├── README.md                    this file
+houses-from-outside/
+|-- index.html                   page shell and HUD markup
+|-- server.js                    optional local server (Node.js)
+|-- css/
+|   `-- style.css                HUD, help overlay, loading screen
+|-- js/
+|   |-- three-loader.js          loads Three.js from vendor/, CDN as fallback
+|   |-- config.js                every tunable constant
+|   |-- shaders.js               all hand-written GLSL
+|   |-- materials.js             ShaderMaterial factories
+|   |-- textures.js              texture loading, sRGB, anisotropy, tiling
+|   |-- lighting.js              lights, shadows, day-night, orbiting light
+|   |-- building.js              the building model
+|   |-- cottage.js               the cottage model + texture switching
+|   |-- environment.js           ground, sky, road, trees, props
+|   |-- controls.js              custom keyboard + mouse camera rig
+|   |-- hud.js                   HUD rendering and updates
+|   `-- main.js                  renderer, raycasting, render loop, snapshots
+|-- assets/
+|   `-- textures/                31 generated PNG files
+|-- tools/
+|   `-- gen_textures.py          regenerates every texture
+|-- vendor/
+|   `-- three.module.js          Three.js r169 (MIT), kept for offline running
+|-- vercel.json                  cache headers, only used by the optional deploy
+|-- .gitignore
+`-- README.md                    this file
 ```
 
 ---
@@ -224,14 +245,13 @@ three fail. The HUD shows which source was used.
 
 | Symptom | Cause and fix |
 |---|---|
-| Black screen, console says `Failed to load module` | The page was opened as a file. Use `2-START-PROJECT.bat`, not a double-click on `index.html`. |
-| Red panel: *Three.js could not be loaded* | `vendor\three.module.js` is missing and there is no internet. Run `1-DOWNLOAD-LIBS.bat` once while online. |
-| `1-DOWNLOAD-LIBS.bat` fails | Download <https://unpkg.com/three@0.169.0/build/three.module.js> manually and save it into `vendor\` with exactly that file name. |
-| `Python was not found` / server window closes at once | Install Python 3 from python.org **or** Node.js from nodejs.org, then run `2-START-PROJECT.bat` again. |
-| Port 8204 already in use | Close the old server window, or edit the `PORT` line at the top of `2-START-PROJECT.bat`. |
-| Textures are missing / white surfaces | The `assets\textures` folder was not copied. Re-extract the ZIP, keeping the folder structure intact. |
+| Black screen; console shows `Failed to load module script` or a CORS error | `index.html` was opened by double-click as `file://`. Start a local server (see Quick start) and open the `http://localhost:...` address instead. |
+| Red panel: *Three.js could not be loaded* | `vendor/three.module.js` is missing. Put the file back into `vendor/`; it must be about 1.2 MB. |
+| `python` is not recognised | Use `py -3 -m http.server 8204`, or Method 1 (Live Server), or Method 3 (`node server.js`). |
+| Port 8204 is already in use | Start on another port, e.g. `python -m http.server 8500`, then open <http://localhost:8500/index.html>. |
+| Textures missing, surfaces are white | The `assets/textures` folder was not copied. Re-extract the ZIP and keep the folder structure intact. |
 | Keyboard does nothing | Click once on the 3D area first so the canvas has focus. |
-| Low frame rate | Press `X` to turn shadows off, or `M` to stop the wind. |
+| Low frame rate | Press `X` to switch shadows off, or `M` to stop the wind. |
 
 ---
 
@@ -241,8 +261,7 @@ All JavaScript, GLSL, CSS and Python in this project was written by the two grou
 members listed above. Three.js (MIT licence) is the only third-party dependency
 and it is loaded unmodified from `vendor/`. All textures are procedurally
 generated by `tools/gen_textures.py`. The report screenshots must be captured
-from your own running instance of the project with the `P` key — see
-`SNAPSHOT-GUIDE.md`.
+from your own running instance of the project with the `P` key.
 
 
 ---

@@ -4,7 +4,7 @@
  * Loads the Three.js ES module and re-exports it as `THREE`.
  *
  * Resolution order:
- *   1. ./vendor/three.module.js   (offline copy - created by 1-DOWNLOAD-LIBS.bat)
+ *   1. ./vendor/three.module.js   (offline copy, shipped inside this folder)
  *   2. unpkg CDN                  (needs internet)
  *   3. jsDelivr CDN               (needs internet)
  *
@@ -38,8 +38,8 @@ for (const source of SOURCES) {
 if (!loaded) {
 	const message =
 		"Three.js could not be loaded.\n\n" +
-		"Fix: run 1-DOWNLOAD-LIBS.bat once while you have internet, " +
-		"then run 2-START-PROJECT.bat again.\n\nDetails:\n" +
+		"Fix: check that vendor/three.module.js exists inside the project " +
+		"folder, then reload this page from http://localhost.\n\nDetails:\n" +
 		errors.join("\n")
 	document.body.innerHTML =
 		'<pre style="font:14px/1.6 Consolas,monospace;color:#E97366;background:#191919;' +
